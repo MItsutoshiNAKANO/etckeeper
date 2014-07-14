@@ -95,7 +95,9 @@ fi
 cd "$ETCKEEPER_DIR"
 export ETCKEEPER_DIR
 
-if [ -d ".git" ]; then
+if [ ! -z "$VCS" ]; then
+	true
+elif [ -d ".git" ]; then
 	VCS=git
 elif [ -d ".hg" ]; then
 	VCS=hg
