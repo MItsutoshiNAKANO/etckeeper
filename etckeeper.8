@@ -72,11 +72,10 @@ ETCKEEPER_AVOID_PACKAGELIST:
 Because it is slow that some package manager make the packagelist
 (eg, rpm -qa), high-level package manager might time out.
 If you think that the packagelist is unnecessary,
-set AVOID_PACKAGELIST=1. in etckeeper.conf
+set AVOID_PACKAGELIST=1 in etckeeper.conf.
 Or if you want to avoid it temporarily,
-you can use environment variable ETCKEEPER_AVOID_PACKAGELIST=1 .
-(eg, ETCKEEPER_AVOID_PACKAGELIST=1 zypper update)
-AVOID_PACKAGELIST=1
+you can use environment variable ETCKEEPER_AVOID_PACKAGELIST=1
+(eg, ETCKEEPER_AVOID_PACKAGELIST=1 zypper update).
 
 .SH SEE ALSO
 /usr/share/doc/etckeeper/README.md.gz
