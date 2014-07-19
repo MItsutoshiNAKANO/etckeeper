@@ -116,6 +116,13 @@ if [ -z "$VCS" ]; then
 fi
 export VCS
 
+#If environment variable ETCKEEPER_AVOID_PACKAGELIST is not null,
+# AVOID_PACKAGELIST in etckeeper.conf is overridden here.
+if [ -n "$ETCKEEPER_AVOID_PACKAGELIST" ]; then
+	AVOID_PACKAGELIST="$ETCKEEPER_AVOID_PACKAGELIST"
+fi
+export AVOID_PACKAGELIST
+
 lsscripts() {
 	perl -e '
 		$dir=shift;
