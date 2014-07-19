@@ -1,4 +1,9 @@
 #!/bin/sh
+
+if [ "$AVOID_PACKAGELIST" = "1" ]; then
+	exit 0
+fi
+
 # This list will be later used when committing.
 mkdir -p /var/cache/etckeeper/
 etckeeper list-installed > /var/cache/etckeeper/packagelist.pre-install
