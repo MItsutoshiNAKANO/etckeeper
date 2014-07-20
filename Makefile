@@ -28,7 +28,7 @@ install:
 	$(INSTALL_DATA) etckeeper.8 $(DESTDIR)$(mandir)/man8/etckeeper.8
 	mkdir -p $(DESTDIR)$(etcdir)/bash_completion.d
 	$(INSTALL_DATA) bash_completion $(DESTDIR)$(etcdir)/bash_completion.d/etckeeper
-ifeq ($(HIGHLEVEL_PACKAGE_MANAGER),apt)
+ifeq ($(ENABLE_APT),1)
 	mkdir -p $(DESTDIR)$(etcdir)/apt/apt.conf.d
 	$(INSTALL_DATA) apt.conf $(DESTDIR)$(etcdir)/apt/apt.conf.d/05etckeeper
 	mkdir -p $(DESTDIR)$(etcdir)/cruft/filters-unex
@@ -38,13 +38,13 @@ ifeq ($(LOWLEVEL_PACKAGE_MANAGER),pacman-g2)
 	mkdir -p $(DESTDIR)$(etcdir)/pacman-g2/hooks
 	$(INSTALL_DATA) pacman-g2.hook $(DESTDIR)$(etcdir)/pacman-g2/hooks/etckeeper
 endif
-ifeq ($(HIGHLEVEL_PACKAGE_MANAGER),yum)
+ifeq ($(ENABLE_YUM),1)
 	mkdir -p $(DESTDIR)$(prefix)/lib/yum-plugins
 	$(INSTALL_DATA) yum-etckeeper.py $(DESTDIR)$(prefix)/lib/yum-plugins/etckeeper.py
 	mkdir -p $(DESTDIR)$(etcdir)/yum/pluginconf.d
 	$(INSTALL_DATA) yum-etckeeper.conf $(DESTDIR)$(etcdir)/yum/pluginconf.d/etckeeper.conf
 endif
-ifeq ($(HIGHLEVEL_PACKAGE_MANAGER),zypper)
+ifeq ($(ENABLE_ZYPPER),1)
 	mkdir -p $(DESTDIR)$(prefix)/lib/zypp/plugins/commit
 	$(INSTALL) zypper-etckeeper.py $(DESTDIR)$(prefix)/lib/zypp/plugins/commit/zypper-etckeeper.py
 endif
