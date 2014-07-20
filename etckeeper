@@ -42,9 +42,6 @@ if [ ! -z "$DARCS_COMMIT_OPTIONS" ]; then
 	export DARCS_COMMIT_OPTIONS
 fi
 
-if [ ! -z "$HIGHLEVEL_PACKAGE_MANAGER" ]; then
-	export HIGHLEVEL_PACKAGE_MANAGER
-fi
 if [ ! -z "$LOWLEVEL_PACKAGE_MANAGER" ]; then
 	export LOWLEVEL_PACKAGE_MANAGER
 fi
