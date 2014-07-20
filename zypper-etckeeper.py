@@ -33,7 +33,7 @@ class EtckeeperPlugin(zypp_plugin.Plugin):
                 raise
         self.ack()
 
-
+os.environ["HIGHLEVEL_PACKAGE_MANAGER"] = "zypper"
 os.environ["LANG"] = "C"
 plugin = EtckeeperPlugin()
 plugin.main()
