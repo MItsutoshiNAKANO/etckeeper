@@ -18,12 +18,26 @@ def _call_etckeeper(install_arg):
 
 class EtckeeperPlugin(zypp_plugin.Plugin):
     def PLUGINBEGIN(self, headers, body):
-        _call_etckeeper('pre-install')
+        #_call_etckeeper('pre-install')
+        f = open('/tmp/pluginbegin.json', 'a')
+        f.write(body);
+        self.ack()
+
+    def COMMITBEGIN(self, headers, body):
+        f = open('/tmp/commitbegin.json', 'a')
+        f.write(body);
+        self.ack()
+
+    def COMMITEND(self, headers, body):
+        f = open('/tmp/commitend.json', 'a')
+        f.write(body);
         self.ack()
 
     def PLUGINEND(self, headers, body):
         try:
-            _call_etckeeper('post-install')
+            #_call_etckeeper('post-install')
+            f = open('/tmp/pluginend.json', 'a')
+            f.write(body);
         except OSError as e:
             # if etckeeper was just removed, executing it will fail with
             # ENOENT
