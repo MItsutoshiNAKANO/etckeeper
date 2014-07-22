@@ -1,32 +1,129 @@
 #!/bin/sh
 set -e
 
-if [ -z "$ETCKEEPER_CONF_DIR" ]; then
-	ETCKEEPER_CONF_DIR=/etc/etckeeper
-fi
+### parse options ###
+help_flag=
+target_dir=
+vcs=
+conf_file=
+conf_dir=
+usage_flag=
+while getopts "hd:s:f:c:" f
+do
+	case "$f" in
+	h) help_flag=1;;
+	d) target_dir="$OPTARG";;
+	s) vcs="$OPTARG";;
+	f) conf_file="$OPTARG";;
+	c) conf_dir="$OPTARG";;
+	'?') usage_flag=1 ;;
+	esac
+done
+shift $(($OPTIND - 1))
 
-conf="$ETCKEEPER_CONF_DIR/etckeeper.conf"
-
-usage() {
-	echo "usage: etckeeper command [-d directory]" >&2
+### usage & help ###
+usage() { # output to stdout!
+	echo "usage: etckeeper [-h] [-d target_Dir] [-s vcS_type] [-f conf_File] [-c Conf_dir] command [args...]"
+}
+usage_and_exit() {
+	usage # output to stdout!
 	exit 1
 }
-
-if [ -e $conf ]; then
-	. $conf
+if [ "$usage_flag" = '1' ]; then
+	usage_and_exit >&2
 fi
 
+### show manual.  ###
+show_man () {
+	man etckeeper || usage >&2
+	exit 0
+}
+if [ "$help_flag" = "1" ]; then
+	show_man
+fi
+
+### get command name ###
+if [ -z "$1" ]; then
+	usage_and_exit >&2
+fi
+command="$1"
+shift 1
+
+### set target dir ###
+if [ -n "$target_dir" ]; then
+	ETCKEEPER_DIR="$target_dir"
+elif [ "x$1" = "x-d" ]; then
+	if [ -n "$2" ]; then
+		ETCKEEPER_DIR="$2"
+		shift 2
+	else
+		usage_and_exit >&2
+	fi
+elif [ -z "$ETCKEEPER_DIR" ]; then
+	ETCKEEPER_DIR='/etc'
+fi
+export ETCKEEPER_DIR
+
+### set conf_dif ###
+if [ -n "$conf_dir" ]; then
+	ETCKEEPER_CONF_DIR="$conf_dir"
+fi
+if [ -z "$ETCKEEPER_CONF_DIR" ]; then
+	ETCKEEPER_CONF_DIR='/etc/etckeeper'
+fi
+export ETCKEEPER_CONF_DIR
+
+### set conf_file ###
+if [ -n "$conf_file" ]; then
+	conf="$conf_file"
+elif [ "$ETCKEEPER_DIR" != "/etc" ]; then
+	conf=''
+else
+	conf="$ETCKEEPER_CONF_DIR/etckeeper.conf"
+fi
+
+### load conf_file ###
+if [ -n "$conf" -a -e "$conf" ]; then
+	. "$conf"
+fi
+
+### cd ###
+cd "$ETCKEEPER_DIR"
+
+### set vcs ###
+if [ -n "$vcs" ]; then
+	VCS="$vcs"
+elif [ -n "$VCS" ];then
+	true
+elif [ -d ".git" ]; then
+	VCS=git
+elif [ -d ".hg" ]; then
+	VCS=hg
+elif [ -d "_darcs" ]; then
+	VCS=darcs
+elif [ -d ".bzr" ]; then
+	VCS=bzr
+else
+	echo "Please configure a VCS in $conf" >&2
+	exit 1
+fi
+case "$VCS" in
+git) ;;
+hg) ;;
+darcs) ;;
+bzr) ;;
+*)
+	echo "etckeeper: does not support $VCS." >&2
+	exit 1;;
+esac
+export VCS
+
+### reset variables ###
 if [ -n "$GIT_WORK_TREE" ]; then
 	unset GIT_WORK_TREE
 fi
 if [ -n "$GIT_DIR" ]; then
 	unset GIT_DIR
-fi
-
-program_directory="${0%/*}"
-if [ -n "$program_directory" ]; then
-	PATH="$PATH:$program_directory"
-	export PATH
 fi
 
 if [ ! -z "$GIT_COMMIT_OPTIONS" ]; then
@@ -54,20 +151,18 @@ fi
 if [ ! -z "$AVOID_SPECIAL_FILE_WARNING" ]; then
 	export AVOID_SPECIAL_FILE_WARNING
 fi
-
 if [ ! -z "$PUSH_REMOTE" ]; then
 	export PUSH_REMOTE
 fi
 
-if [ -z "$1" ]; then
-	usage
-elif [ "x$1" = "x-h" ] || [ "x$1" = "x--help" ]; then
-	man etckeeper || echo "Usage: etckeeper command [-d directory]" >&2
-	exit 0
+### set PATH ###
+program_directory="${0%/*}"
+if [ -n "$program_directory" ]; then
+	PATH="$PATH:$program_directory"
+	export PATH
 fi
-command="$1"
-shift 1
 
+### do ###
 # compatability code
 if [ "$command" = "post-apt" ]; then
 	command=post-install
@@ -84,37 +179,6 @@ if [ ! -d "$ETCKEEPER_CONF_DIR/$command.d" ]; then
 	echo "etckeeper: $ETCKEEPER_CONF_DIR/$command.d does not exist" >&2
 	exit 1
 fi
-
-if [ "x$1" = "x-d" ]; then
-	if [ -n "$2" ]; then
-		ETCKEEPER_DIR="$2"
-		shift 2
-	else
-		usage
-	fi
-fi
-
-if [ -z "$ETCKEEPER_DIR" ]; then
-	ETCKEEPER_DIR=/etc
-fi
-cd "$ETCKEEPER_DIR"
-export ETCKEEPER_DIR
-
-if [ -d ".git" ]; then
-	VCS=git
-elif [ -d ".hg" ]; then
-	VCS=hg
-elif [ -d "_darcs" ]; then
-	VCS=darcs
-elif [ -d ".bzr" ]; then
-	VCS=bzr
-fi
-
-if [ -z "$VCS" ]; then
-	echo "Please configure a VCS in $conf" >&2
-	exit 1
-fi
-export VCS
 
 lsscripts() {
 	perl -e '
