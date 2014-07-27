@@ -113,7 +113,7 @@ hg) ;;
 darcs) ;;
 bzr) ;;
 *)
-	echo "etckeeper: does not support $VCS." >&2
+	echo "etckeeper: unsupported VCS $VCS" >&2
 	exit 1;;
 esac
 export VCS
