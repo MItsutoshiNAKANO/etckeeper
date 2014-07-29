@@ -74,17 +74,25 @@ fi
 export ETCKEEPER_CONF_DIR
 
 ### set conf_file ###
+# ETCKEEPER_CONF_FILE is a variable that is used only
+# in etckeeper command inside.
+# Please do not set ETCKEEPER_CONF_FILE in your shell or etckeeper.conf.
 if [ -n "$conf_file" ]; then
-	conf="$conf_file"
+	ETCKEEPER_CONF_FILE="$conf_file"
 elif [ "$ETCKEEPER_DIR" != "/etc" ]; then
-	conf=''
+	unset ETCKEEPER_CONF_FILE
+elif [ -n "$ETCKEEPER_CONF_FILE" ]; then
+	true
 else
-	conf="$ETCKEEPER_CONF_DIR/etckeeper.conf"
+	ETCKEEPER_CONF_FILE="$ETCKEEPER_CONF_DIR/etckeeper.conf"
 fi
 
 ### load conf_file ###
-if [ -n "$conf" -a -e "$conf" ]; then
-	. "$conf"
+if [ -n "$ETCKEEPER_CONF_FILE" -a -e "$ETCKEEPER_CONF_FILE" ]; then
+	export ETCKEEPER_CONF_FILE
+	. "$ETCKEEPER_CONF_FILE"
+else
+	unset ETCKEEPER_CONF_FILE
 fi
 
 ### cd ###
